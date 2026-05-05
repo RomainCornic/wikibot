@@ -89,23 +89,69 @@ class GuerrillaMailClient:
 
         return link
     
-    def get_latest_code(self, timeout=60, pattern=r"\b\d{6}\b"):
-        mail = self.wait_for_email(timeout=timeout)
-
-        if not mail:
-            return None
-
+    def get_latest_code(self, mail, pattern=r"\b\d{6}\b"):
         content = self.fetch_email(mail["mail_id"])
 
-        # certains mails mettent le code dans le body HTML, d'autres dans le texte
         body = (
             content.get("mail_body", "")
             or content.get("mail_excerpt", "")
         )
 
-        match = re.search(pattern, body)
+        match = re.search(r"\b(\d{6})\b", body)
 
         if match:
-            return match.group(0)
+            return match.group(1)
 
         return None
+    def snapshot_mail_ids(self):
+        mails = self.get_email_list()
+        return {mail["mail_id"] for mail in mails}
+
+
+    def wait_for_matching_email(
+        self,
+        known_ids=None,
+        sender=None,
+        subject_contains=None,
+        timeout=60,
+        poll_interval=3,
+    ):
+        known_ids = known_ids or set()
+
+        start = time.time()
+
+        while time.time() - start < timeout:
+            mails = self.get_email_list()
+            for mail in mails:
+                mail_id = mail["mail_id"]
+
+                if mail_id in known_ids:
+                    continue
+
+                mail_sender = mail.get("mail_from", "").lower()
+                mail_subject = mail.get("mail_subject", "").lower()
+
+                if sender and sender.lower() not in mail_sender:
+                    continue
+
+                if subject_contains and subject_contains.lower() not in mail_subject:
+                    continue
+
+                return mail
+
+            time.sleep(poll_interval)
+
+        return None
+        
+
+    def get_email_list(self):
+        response = self.session.get(
+            self.API_URL,
+            params={
+                "f": "get_email_list",
+                "offset": 0
+            }
+        )
+
+        data = response.json()
+        return data.get("list", [])

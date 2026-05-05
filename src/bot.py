@@ -1,11 +1,11 @@
-from playwright.sync_api import sync_playwright
-from email_service import generate_temp_email
+from playwright.sync_api import sync_playwright,Page
 import json
 import os
 from datetime import datetime
 from random_username.generate import generate_username
 from email_service_copy import GuerrillaMailClient
-
+import re
+import random
 
 
 
@@ -29,19 +29,12 @@ def run_bot():
         SITE_URL = os.environ.get("SITE_URL", "https://www.wiki-masters.com/")
         SITE_PASSWORD = os.environ.get("SITE_PASSWORD", "")
         print(SITE_URL)
+        known_ids = gm.snapshot_mail_ids()
+
         try:
             # --- Navigation ---
             page.goto(SITE_URL)
             actions_log.append("✅ Navigation vers la page de login")
-
-            # --- Inscription/Connexion ---
-            page.fill("#email", email)
-            page.fill("#password", "TestPassword123!")
-            page.fill("#username", username)
-            # --- Navigation ---
-            page.goto(SITE_URL)
-            actions_log.append("✅ Navigation vers la page de login")
-
             # --- Inscription/Connexion ---
             page.get_by_role("textbox", name="Nom d'utilisateur").fill(username)
             page.get_by_role("textbox", name="Adresse courriel").fill(email)
@@ -52,36 +45,38 @@ def run_bot():
             page.get_by_role("button", name="Créer mon compte").click()
 
 
-            code = gm.get_latest_code()
-            if code:
-                print("code:", code)
-            else:
-                print("pas de mail reçu")
+            print("waiting for code")
+            print("known IDs:",known_ids)
+            mail = gm.wait_for_matching_email(known_ids=known_ids)
+            print("mail:",mail)
+
+            code = gm.get_latest_code(mail)
+
+
+            assert code is not None, "Pas de mail recu ou pas de code trouvé"
                 
-            page.get_by_role("textbox", name="Code de vérification").fill("code")
+            page.get_by_role("textbox", name="Code de vérification").fill(code)
+            page.get_by_role("button", name="Vérifier et continuer").click()
 
-
-            page.click("button[type='submit']")
-            page.wait_for_load_state("networkidle")
+            # page.wait_for_load_state("networkidle")
             actions_log.append("✅ Connexion effectuée")
+
 
             # --- Screenshot ---
             os.makedirs("screenshots", exist_ok=True)
             page.screenshot(path="screenshots/apres_login.png")
             actions_log.append("✅ Screenshot pris")
+            page.get_by_role("link", name="Paquets").wait_for(state="visible",timeout=5000)
+            page.get_by_role("link", name="Paquets").click()
+            counter=get_counter_value(page)
+            while counter>0:
+                open_paquet(page)
+                counter=get_counter_value(page)
+                page.wait_for_timeout(100)
 
-            # --- Découverte des onglets ---
-            tabs = page.query_selector_all("nav a")
-            for tab in tabs:
-                tab_name = tab.inner_text().strip()
-                if tab_name:
-                    tab.click()
-                    page.wait_for_load_state("networkidle")
-                    page.screenshot(path=f"screenshots/onglet_{tab_name}.png")
-                    actions_log.append(f"✅ Onglet visité : {tab_name}")
-
+            
         except Exception as e:
-            error_msg = f"❌ Erreur : {str(e)}"
+            error_msg = f"❌ Erreur : {e}"
             report["erreurs"].append(error_msg)
             page.screenshot(path="screenshots/erreur.png")
 
@@ -106,6 +101,24 @@ def run_bot():
             print(err)
 
     return report
+
+
+def open_paquet(page: Page):
+    page.get_by_role("button", name="Ouvrir un paquet Ouvrir").click()
+    page.locator(".flex.items-center.gap-4 > button:nth-child(3)").wait_for(state="visible",timeout=5000)
+    page.locator(".flex.items-center.gap-4 > button:nth-child(3)").click()
+    page.wait_for_timeout(random.randint(25,250))
+    page.locator(".flex.items-center.gap-4 > button:nth-child(3)").click()
+    page.wait_for_timeout(random.randint(25,250))
+    page.locator(".flex.items-center.gap-4 > button:nth-child(3)").click()
+    page.wait_for_timeout(random.randint(25,250))
+    page.locator(".flex.items-center.gap-4 > button:nth-child(3)").click()
+    page.wait_for_timeout(random.randint(25,250))
+    page.get_by_role("button", name="Continuer").click()
+
+def get_counter_value(page: Page):
+    element = page.locator('span.text-\\[var\\(--color-accent\\)\\]')
+    return int(element.inner_text().strip())
 
 if __name__ == "__main__":
     run_bot()

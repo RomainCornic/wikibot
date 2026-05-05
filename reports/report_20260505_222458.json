@@ -1,0 +1,12 @@
+{
+  "date": "2026-05-05 22:24:40",
+  "email_utilisé": "euphoricSeagull8_x9hwhtrm@guerrillamailblock.com",
+  "actions": [
+    "✅ Navigation vers la page de login",
+    "✅ Connexion effectuée",
+    "✅ Screenshot pris"
+  ],
+  "erreurs": [
+    "❌ Erreur : invalid literal for int() with base 10: 'Wiki'"
+  ]
+}

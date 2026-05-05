@@ -1,0 +1,12 @@
+{
+  "date": "2026-05-05 22:28:15",
+  "email_utilisé": "somberDoughnut8_8c7xs59a@guerrillamailblock.com",
+  "actions": [
+    "✅ Navigation vers la page de login",
+    "✅ Connexion effectuée",
+    "✅ Screenshot pris"
+  ],
+  "erreurs": [
+    "❌ Erreur : invalid literal for int() with base 10: 'Wiki'"
+  ]
+}
