@@ -6,6 +6,7 @@ from datetime import datetime
 
 def run_bot():
     email = generate_temp_email()
+
     actions_log = []
     report = {
         "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -17,10 +18,11 @@ def run_bot():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)  # ← Obligatoire sur GitHub Actions
         page = browser.new_page()
-
+        SITE_URL = os.environ.get("SITE_URL", "https://fallback-url.com")
+        SITE_PASSWORD = os.environ.get("SITE_PASSWORD", "")
         try:
             # --- Navigation ---
-            page.goto("https://mon-site-web.com/login")
+            page.goto(SITE_URL)
             actions_log.append("✅ Navigation vers la page de login")
 
             # --- Inscription/Connexion ---
