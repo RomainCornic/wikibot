@@ -88,3 +88,24 @@ class GuerrillaMailClient:
             self.session.get(link)
 
         return link
+    
+    def get_latest_code(self, timeout=60, pattern=r"\b\d{6}\b"):
+        mail = self.wait_for_email(timeout=timeout)
+
+        if not mail:
+            return None
+
+        content = self.fetch_email(mail["mail_id"])
+
+        # certains mails mettent le code dans le body HTML, d'autres dans le texte
+        body = (
+            content.get("mail_body", "")
+            or content.get("mail_excerpt", "")
+        )
+
+        match = re.search(pattern, body)
+
+        if match:
+            return match.group(0)
+
+        return None

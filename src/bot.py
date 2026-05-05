@@ -38,16 +38,33 @@ def run_bot():
             page.fill("#email", email)
             page.fill("#password", "TestPassword123!")
             page.fill("#username", username)
+            # --- Navigation ---
+            page.goto(SITE_URL)
+            actions_log.append("✅ Navigation vers la page de login")
+
+            # --- Inscription/Connexion ---
+            page.get_by_role("textbox", name="Nom d'utilisateur").fill(username)
+            page.get_by_role("textbox", name="Adresse courriel").fill(email)
+            page.get_by_role("textbox", name="Mot de passe").fill("TestPassword123!")
+
+            page.fill("#username", username)
+            page.get_by_role("checkbox", name="Je confirme avoir au moins 18").check()
+            page.get_by_role("button", name="Créer mon compte").click()
+
+
+            code = gm.get_latest_code()
+            if code:
+                print("code:", code)
+            else:
+                print("pas de mail reçu")
+                
+            page.get_by_role("textbox", name="Code de vérification").fill("code")
+
 
             page.click("button[type='submit']")
             page.wait_for_load_state("networkidle")
             actions_log.append("✅ Connexion effectuée")
 
-            link = gm.confirm_latest_email()
-            if link:
-                print("confirmation OK:", link)
-            else:
-                print("pas de mail reçu")
             # --- Screenshot ---
             os.makedirs("screenshots", exist_ok=True)
             page.screenshot(path="screenshots/apres_login.png")
