@@ -3,9 +3,18 @@ from email_service import generate_temp_email
 import json
 import os
 from datetime import datetime
+from random_username.generate import generate_username
+from email_service_copy import GuerrillaMailClient
+
+
+
+
 
 def run_bot():
-    email = generate_temp_email()
+    username=generate_username(1)[0]
+    gm = GuerrillaMailClient(prefix=username)
+    email = gm.create_email()
+    print(f"email = {email}")
 
     actions_log = []
     report = {
@@ -14,12 +23,12 @@ def run_bot():
         "actions": [],
         "erreurs": []
     }
-
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)  # ← Obligatoire sur GitHub Actions
         page = browser.new_page()
-        SITE_URL = os.environ.get("SITE_URL", "https://fallback-url.com")
+        SITE_URL = os.environ.get("SITE_URL", "https://www.wiki-masters.com/")
         SITE_PASSWORD = os.environ.get("SITE_PASSWORD", "")
+        print(SITE_URL)
         try:
             # --- Navigation ---
             page.goto(SITE_URL)
@@ -28,10 +37,17 @@ def run_bot():
             # --- Inscription/Connexion ---
             page.fill("#email", email)
             page.fill("#password", "TestPassword123!")
+            page.fill("#username", username)
+
             page.click("button[type='submit']")
             page.wait_for_load_state("networkidle")
             actions_log.append("✅ Connexion effectuée")
 
+            link = gm.confirm_latest_email()
+            if link:
+                print("confirmation OK:", link)
+            else:
+                print("pas de mail reçu")
             # --- Screenshot ---
             os.makedirs("screenshots", exist_ok=True)
             page.screenshot(path="screenshots/apres_login.png")
