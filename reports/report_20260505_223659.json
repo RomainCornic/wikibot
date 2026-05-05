@@ -1,0 +1,12 @@
+{
+  "date": "2026-05-05 22:36:41",
+  "email_utilisé": "pluckySeahorse6_f76eh5xl@guerrillamailblock.com",
+  "actions": [
+    "✅ Navigation vers la page de login",
+    "✅ Connexion effectuée",
+    "✅ Screenshot pris"
+  ],
+  "erreurs": [
+    "❌ Erreur : Locator.wait_for: Error: strict mode violation: locator(\"span.text-\\\\[var\\\\(--color-accent\\\\)\\\\]\") resolved to 3 elements:\n    1) <span class=\"text-[var(--color-accent)]\">Wiki</span> aka get_by_role(\"link\", name=\"WikiMasters\")\n    2) <span class=\"text-lg md:text-xl font-bold text-[var(--color-accent)] drop-shadow-md\">Ouvrir</span> aka get_by_role(\"button\", name=\"Ouvrir un paquet Ouvrir\")\n    3) <span class=\"text-[var(--color-accent)]\">10</span> aka get_by_text(\"10\", exact=True)\n\nCall log:\n  - waiting for locator(\"span.text-\\\\[var\\\\(--color-accent\\\\)\\\\]\") to be visible\n"
+  ]
+}

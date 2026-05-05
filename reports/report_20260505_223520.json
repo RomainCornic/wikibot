@@ -1,0 +1,12 @@
+{
+  "date": "2026-05-05 22:35:02",
+  "email_utilisé": "giddyUnicorn3_f4i63mrm@guerrillamailblock.com",
+  "actions": [
+    "✅ Navigation vers la page de login",
+    "✅ Connexion effectuée",
+    "✅ Screenshot pris"
+  ],
+  "erreurs": [
+    "❌ Erreur : invalid literal for int() with base 10: 'Wiki'"
+  ]
+}

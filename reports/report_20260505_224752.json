@@ -1,0 +1,12 @@
+{
+  "date": "2026-05-05 22:47:21",
+  "email_utilisé": "mereDove5_pxfkqdw6@guerrillamailblock.com",
+  "actions": [
+    "✅ Navigation vers la page de login",
+    "✅ Connexion effectuée",
+    "✅ Screenshot pris"
+  ],
+  "erreurs": [
+    "❌ Erreur : Locator.wait_for: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator(\".flex.items-center.gap-4 > button:nth-child(3)\") to be visible\n"
+  ]
+}
