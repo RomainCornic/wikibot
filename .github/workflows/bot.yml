@@ -1,0 +1,75 @@
+name: 🤖 Web Bot
+
+on:
+  # ⏰ Planification automatique
+  schedule:
+    - cron: '0 8 * * *'      # Tous les jours à 8h00 UTC
+    - cron: '0 20 * * *'     # Tous les jours à 20h00 UTC
+
+  # 🖱️ Lancement manuel depuis l'interface GitHub
+  workflow_dispatch:
+    inputs:
+      debug:
+        description: 'Mode debug ?'
+        required: false
+        default: 'false'
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest    # Serveur Ubuntu gratuit fourni par GitHub
+    timeout-minutes: 30       # Sécurité : arrêt après 30 min
+
+    steps:
+      # 1. Récupère ton code
+      - name: 📥 Checkout du code
+        uses: actions/checkout@v4
+
+      # 2. Installe Python
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'           # Met en cache les dépendances (plus rapide)
+
+      # 3. Installe les dépendances Python
+      - name: 📦 Installer les dépendances
+        run: pip install -r requirements.txt
+
+      # 4. Installe Playwright et Chromium
+      - name: 🌐 Installer Playwright
+        run: |
+          playwright install chromium
+          playwright install-deps chromium
+
+      # 5. Lance le bot
+      - name: 🤖 Lancer le bot
+        run: python bot.py
+        env:
+          # ← Tes variables sensibles (URLs, mots de passe)
+          SITE_URL: ${{ secrets.SITE_URL }}
+          SITE_PASSWORD: ${{ secrets.SITE_PASSWORD }}
+
+      # 6. Sauvegarde les screenshots et rapports
+      - name: 📸 Upload des artifacts
+        if: always()           # ← Même si le bot plante !
+        uses: actions/upload-artifact@v4
+        with:
+          name: bot-results-${{ github.run_number }}
+          path: |
+            screenshots/
+            reports/
+          retention-days: 30   # Gardé 30 jours
+
+      # 7. (Optionnel) Envoie un email si erreur
+      - name: 📧 Notification en cas d'échec
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.EMAIL_USER }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "❌ Bot en échec - Run #${{ github.run_number }}"
+          to: toi@gmail.com
+          from: ton.bot@gmail.com
+          body: "Le bot a rencontré une erreur. Voir les logs sur GitHub Actions."
