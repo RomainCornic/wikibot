@@ -3,7 +3,7 @@ import json
 import os
 import random
 from datetime import datetime
-from bot_helper import safe_goto,load_bots_db,screenshot,save_bots_db,BOTS_DB_PATH,SCREENSHOTS_DIR,REPORTS_DIR,HEADLESS,LOGIN_URL,SITE_URL
+from bot_helper import open_all_paquets,safe_goto,load_bots_db,screenshot,save_bots_db,BOTS_DB_PATH,SCREENSHOTS_DIR,REPORTS_DIR,HEADLESS,LOGIN_URL,SITE_URL,get_counter_value,open_paquet
 
 
 
@@ -24,72 +24,7 @@ def login(page: Page, email: str, password: str):
     print("✅ Connecté avec succès")
 
 
-# Paquets
 
-def get_counter_value(page: Page) -> int:
-    locator = page.locator(
-        '//span[contains(@class, "color-accent")'
-        ' and string-length(normalize-space(text())) <= 2'
-        ' and translate(normalize-space(text()), "0123456789", "") = ""]'
-    )
-    locator.wait_for(state="visible", timeout=10000)
-    return int(locator.inner_text().strip())
-
-
-def open_paquet(page: Page):
-    btn_open    = page.get_by_role("button", name="Ouvrir un paquet Ouvrir")
-    btn_next    = page.locator(".flex.items-center.gap-4 > button:nth-child(3)")
-    btn_continue = page.get_by_role("button", name="Continuer")
-
-    btn_open.wait_for(state="visible", timeout=20000)
-    btn_open.click()
-
-    for _ in range(4):
-        page.wait_for_timeout(random.randint(50, 250))
-        btn_next.wait_for(state="visible", timeout=10000)
-        btn_next.click()
-
-    page.wait_for_timeout(random.randint(50, 200))
-    btn_continue.click()
-
-
-def open_all_paquets(page: Page) -> dict:
-    page.get_by_role("link", name="Paquets").wait_for(state="visible", timeout=10000)
-    page.get_by_role("link", name="Paquets").click()
-    page.wait_for_timeout(1000)
-
-    paquets_opened = 0
-    errors = []
-
-    while True:
-        try:
-            counter = get_counter_value(page)
-            print(f"📦 Paquets restants : {counter}")
-            if counter <= 0:
-                print("✅ Tous les paquets ouverts")
-                break
-
-            open_paquet(page)
-            paquets_opened += 1
-            page.wait_for_timeout(100)
-
-        except PlaywrightTimeout as e:
-            msg = f"Timeout paquet #{paquets_opened + 1}: {e}"
-            errors.append(msg)
-            print(f"⚠️  {msg}")
-            try:
-                safe_goto(page, page.url)
-                page.wait_for_timeout(2000)
-            except Exception:
-                break
-
-        except Exception as e:
-            msg = f"Erreur paquet #{paquets_opened + 1}: {e}"
-            errors.append(msg)
-            print(f"❌ {msg}")
-            break
-
-    return {"paquets_opened": paquets_opened, "errors": errors}
 
 
 # Session runner 
@@ -154,6 +89,7 @@ def run_session(bot_index: int = None, email: str = None):
 
             # 3. Screenshot collection
             page.get_by_role("link", name="Collection").click()
+            page.get_by_role("heading", name="Collection").wait_for(state="visible", timeout=10000)
             path = screenshot(page, f"collection_{bot['username']}")
             session["screenshots"].append(path)
             session["actions"].append("✅ Screenshot collection")

@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WikiMasters — Bot Manager</title>
+<style>
+  :root {
+    --bg: #0e0e10; --surface: #18181c; --surface2: #222228;
+    --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.13);
+    --accent: #7F77DD; --accent-dim: rgba(127,119,221,0.15);
+    --text: #e8e8f0; --muted: #888796;
+    --success: #1D9E75; --success-dim: rgba(29,158,117,0.15);
+    --danger: #E24B4A; --danger-dim: rgba(226,75,74,0.15);
+    --amber: #EF9F27; --amber-dim: rgba(239,159,39,0.15);
+    --radius: 10px; --radius-lg: 16px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'SF Pro Display','Segoe UI',system-ui,sans-serif; min-height: 100vh; }
+  .shell { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
+
+  .sidebar { background: var(--surface); border-right: 1px solid var(--border); padding: 24px 0; display: flex; flex-direction: column; }
+  .sidebar-logo { padding: 0 20px 28px; border-bottom: 1px solid var(--border); margin-bottom: 12px; }
+  .logo-mark { font-size: 18px; font-weight: 700; letter-spacing: -.5px; color: var(--accent); }
+  .logo-sub { font-size: 11px; color: var(--muted); margin-top: 2px; letter-spacing: .5px; text-transform: uppercase; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 20px; font-size: 13.5px; color: var(--muted); cursor: pointer; border-left: 2px solid transparent; }
+  .nav-item.active { color: var(--accent); border-left-color: var(--accent); background: var(--accent-dim); }
+  .sidebar-footer { margin-top: auto; padding: 16px 20px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
+  .run-btn { width: 100%; padding: 10px; background: var(--accent); color: #fff; border: none; border-radius: var(--radius); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .run-btn:hover { opacity: .85; }
+  .run-btn.secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border2); }
+  .run-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+  .main { padding: 28px 32px; overflow-y: auto; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+  .page-title { font-size: 20px; font-weight: 600; }
+  .topbar-right { display: flex; align-items: center; gap: 10px; }
+  .btn-sm { padding: 7px 14px; border-radius: var(--radius); font-size: 12.5px; cursor: pointer; border: 1px solid var(--border2); background: var(--surface); color: var(--text); }
+  .btn-sm:hover { background: var(--surface2); }
+  .btn-sm.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn-sm.danger { background: var(--danger-dim); border-color: var(--danger); color: var(--danger); }
+
+  .conn-badge { display: flex; align-items: center; gap: 6px; font-size: 12px; padding: 5px 10px; border-radius: 20px; border: 1px solid var(--border2); color: var(--muted); }
+  .conn-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
+  .conn-badge.connected { color: var(--success); border-color: var(--success-dim); }
+  .conn-badge.connected .conn-dot { background: var(--success); animation: pulse 2s infinite; }
+  .conn-badge.error { color: var(--danger); border-color: var(--danger-dim); }
+  .conn-badge.error .conn-dot { background: var(--danger); }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+  .stats-row { display: grid; grid-template-columns: repeat(5,1fr); gap: 14px; margin-bottom: 24px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 18px; }
+  .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 8px; }
+  .stat-value { font-size: 26px; font-weight: 600; line-height: 1; }
+  .stat-value.accent { color: var(--accent); }
+  .stat-value.success { color: var(--success); }
+  .stat-value.amber { color: var(--amber); }
+  .stat-delta { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .progress-wrap { background: var(--surface2); border-radius: 20px; height: 4px; overflow: hidden; margin-top: 6px; }
+  .progress-bar { height: 100%; background: var(--accent); border-radius: 20px; transition: width .4s; }
+
+  .parallel-bar { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px 18px; margin-bottom: 24px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .parallel-bar label { font-size: 12.5px; color: var(--muted); }
+  .parallel-bar input[type=number] { width: 60px; padding: 5px 8px; background: var(--surface2); border: 1px solid var(--border2); border-radius: 7px; color: var(--text); font-size: 13px; text-align: center; }
+  .parallel-bar input[type=checkbox] { accent-color: var(--accent); width: 15px; height: 15px; cursor: pointer; }
+
+  .section-title { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 12px; }
+  .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 24px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th { padding: 11px 16px; text-align: left; font-size: 11px; color: var(--muted); font-weight: 500; border-bottom: 1px solid var(--border); text-transform: uppercase; letter-spacing: .5px; }
+  tbody tr { border-bottom: 1px solid var(--border); cursor: pointer; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--surface2); }
+  tbody td { padding: 12px 16px; }
+  .badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+  .badge.ok { background: var(--success-dim); color: var(--success); }
+  .badge.err { background: var(--danger-dim); color: var(--danger); }
+  .badge.idle { background: var(--surface2); color: var(--muted); }
+  .badge.running { background: var(--amber-dim); color: var(--amber); }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .badge.running .dot { animation: pulse 1s infinite; }
+  .mono { font-family: 'SF Mono','Fira Code',monospace; font-size: 12px; color: var(--muted); }
+  .actions-cell { display: flex; gap: 6px; }
+  .icon-btn { width: 28px; height: 28px; border-radius: 7px; border: 1px solid var(--border2); background: transparent; color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 13px; }
+  .icon-btn:hover { background: var(--surface2); color: var(--text); }
+  .icon-btn:disabled { opacity: .3; cursor: not-allowed; }
+
+  .log-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); }
+  .log-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+  .log-title { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; display: flex; align-items: center; gap: 8px; }
+  .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
+  .live-dot.on { background: var(--success); animation: pulse 1.4s infinite; }
+  .log-body { padding: 12px 16px; font-family: 'SF Mono','Fira Code',monospace; font-size: 12px; height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+  .log-line { display: flex; gap: 12px; line-height: 1.5; }
+  .log-time { color: var(--muted); flex-shrink: 0; }
+  .log-msg.success { color: var(--success); }
+  .log-msg.error { color: var(--danger); }
+  .log-msg.info { color: var(--accent); }
+  .log-msg.warn { color: var(--amber); }
+
+  .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 100; align-items: center; justify-content: center; }
+  .modal-backdrop.open { display: flex; }
+  .modal { background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius-lg); width: 500px; max-height: 80vh; overflow-y: auto; }
+  .modal-head { padding: 18px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .modal-head h2 { font-size: 15px; font-weight: 600; }
+  .modal-close { background: none; border: none; color: var(--muted); font-size: 18px; cursor: pointer; }
+  .modal-body { padding: 20px; }
+  .detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .detail-row:last-child { border-bottom: none; }
+  .detail-label { color: var(--muted); }
+  .detail-val { font-family: 'SF Mono',monospace; font-size: 12px; }
+  .session-item { background: var(--surface2); border-radius: var(--radius); padding: 10px 12px; margin-top: 8px; font-size: 12px; }
+  .session-date { color: var(--muted); margin-bottom: 4px; }
+  .empty { padding: 40px; text-align: center; color: var(--muted); font-size: 13px; }
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid currentColor; border-top-color: transparent; border-radius: 50%; animation: spin .7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--radius); padding: 12px 18px; font-size: 13px; z-index: 200; opacity: 0; transition: opacity .2s; pointer-events: none; }
+  .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">WikiMasters</div>
+      <div class="logo-sub">Bot Manager</div>
+    </div>
+    <div class="nav-item active">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2h5v5H2zm7 0h5v5H9zm-7 7h5v5H2zm7 0h5v5H9z" opacity=".8"/></svg>
+      Dashboard
+    </div>
+    <div class="sidebar-footer">
+      <button class="run-btn" id="btnNew" onclick="newBot()">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M8 2v12M2 8h12"/></svg>
+        Nouveau bot
+      </button>
+      <button class="run-btn secondary" onclick="runAll(false)">▶ Tous (séquentiel)</button>
+      <button class="run-btn secondary" onclick="runAll(true)">⚡ Tous (parallèle)</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="page-title">Dashboard</div>
+      <div class="topbar-right">
+        <div class="conn-badge" id="connBadge">
+          <div class="conn-dot"></div>
+          <span id="connLabel">Connexion…</span>
+        </div>
+        <button class="btn-sm" onclick="refresh()">↻ Actualiser</button>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-label">Bots</div><div class="stat-value accent" id="sBots">—</div><div class="stat-delta">enregistrés</div></div>
+      <div class="stat-card"><div class="stat-label">Actifs</div><div class="stat-value amber" id="sActive">—</div><div class="stat-delta">en ce moment</div></div>
+      <div class="stat-card"><div class="stat-label">Sessions</div><div class="stat-value" id="sSessions">—</div><div class="stat-delta">exécutions totales</div></div>
+      <div class="stat-card"><div class="stat-label">Paquets</div><div class="stat-value success" id="sPaquets">—</div><div class="stat-delta">ouverts au total</div></div>
+      <div class="stat-card">
+        <div class="stat-label">Taux succès</div>
+        <div class="stat-value accent" id="sRate">—</div>
+        <div class="stat-delta">sans erreur</div>
+        <div class="progress-wrap"><div class="progress-bar" id="sBar" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <div class="parallel-bar">
+      <label>Mode parallèle :</label>
+      <input type="checkbox" id="parallelCheck">
+      <label>Max simultané :</label>
+      <input type="number" id="maxParallel" value="3" min="1" max="10">
+      <span style="font-size:12px;color:var(--muted)">— utilisé par le bouton "Tous (parallèle)"</span>
+    </div>
+
+    <div class="section-title">Bots enregistrés</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Username</th><th>Email</th><th>Créé le</th>
+          <th>Sessions</th><th>Paquets</th><th>Statut</th><th>Actions</th>
+        </tr></thead>
+        <tbody id="tableBody">
+          <tr><td colspan="7" class="empty">Chargement…</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-title">Journal en temps réel</div>
+    <div class="log-panel">
+      <div class="log-header">
+        <div class="log-title">
+          <div class="live-dot" id="liveDot"></div>
+          SSE Live log
+        </div>
+        <button class="btn-sm" onclick="clearLog()">Effacer</button>
+      </div>
+      <div class="log-body" id="logBody"></div>
+    </div>
+  </main>
+</div>
+
+<div class="modal-backdrop" id="modalBackdrop" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <h2 id="modalTitle">Détails</h2>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = '';
+let botsCache = [];
+
+function toast(msg, color='var(--text)') {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.style.color = color;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+function log(msg, level='') {
+  const body = document.getElementById('logBody');
+  const time = new Date().toLocaleTimeString('fr-FR');
+  const line = document.createElement('div');
+  line.className = 'log-line';
+  line.innerHTML = `<span class="log-time">${time}</span><span class="log-msg ${level}">${esc(msg)}</span>`;
+  body.appendChild(line);
+  body.scrollTop = body.scrollHeight;
+}
+
+function clearLog() { document.getElementById('logBody').innerHTML = ''; }
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function setConn(ok) {
+  const b = document.getElementById('connBadge');
+  b.className = 'conn-badge ' + (ok ? 'connected' : 'error');
+  document.getElementById('connLabel').textContent = ok ? 'Connecté' : 'Serveur hors ligne';
+}
+
+async function api(method, path, body) {
+  const opts = { method, headers: {'Content-Type':'application/json'} };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(API + path, opts);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({detail: res.statusText}));
+    throw new Error(err.detail || res.statusText);
+  }
+  return res.json();
+}
+
+async function loadStats() {
+  try {
+    const s = await api('GET', '/api/stats');
+    document.getElementById('sBots').textContent     = s.total_bots;
+    document.getElementById('sActive').textContent   = s.active_bots;
+    document.getElementById('sSessions').textContent = s.total_sessions;
+    document.getElementById('sPaquets').textContent  = s.total_paquets;
+    document.getElementById('sRate').textContent     = s.total_sessions > 0 ? s.success_rate + '%' : '—';
+    document.getElementById('sBar').style.width      = s.success_rate + '%';
+    setConn(true);
+  } catch { setConn(false); }
+}
+
+async function loadBots() {
+  try {
+    const data = await api('GET', '/api/bots');
+    botsCache = data.bots || [];
+    renderTable(botsCache);
+    setConn(true);
+  } catch(e) {
+    setConn(false);
+    document.getElementById('tableBody').innerHTML =
+      `<tr><td colspan="7" class="empty">❌ Serveur inaccessible — lance : <code>python server.py</code></td></tr>`;
+  }
+}
+
+function renderTable(bots) {
+  const tbody = document.getElementById('tableBody');
+  if (!bots.length) {
+    tbody.innerHTML = `<tr><td colspan="7" class="empty">Aucun bot — crée-en un avec "Nouveau bot"</td></tr>`;
+    return;
+  }
+  const labels = { ok:'OK', err:'Erreur', idle:'Inactif', running:'Actif' };
+  tbody.innerHTML = bots.map(bot => {
+    const created = bot.created_at ? new Date(bot.created_at).toLocaleDateString('fr-FR') : '—';
+    const running = bot.status === 'running';
+    return `<tr onclick="showBot('${esc(bot.email)}')">
+      <td><strong>${esc(bot.username||'—')}</strong></td>
+      <td class="mono">${esc(bot.email||'—')}</td>
+      <td class="mono">${created}</td>
+      <td style="text-align:center">${bot.total_sessions}</td>
+      <td style="text-align:center">${bot.total_paquets}</td>
+      <td><span class="badge ${bot.status}"><span class="dot"></span>${labels[bot.status]||bot.status}</span></td>
+      <td><div class="actions-cell" onclick="event.stopPropagation()">
+        <button class="icon-btn" title="Relancer" ${running?'disabled':''} onclick="runSession('${esc(bot.email)}')">▶</button>
+        <button class="icon-btn" title="Copier email" onclick="copyText('${esc(bot.email)}')">⎘</button>
+        <button class="icon-btn" title="Supprimer" style="color:var(--danger)" onclick="deleteBot('${esc(bot.email)}','${esc(bot.username)}')">✕</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+async function newBot() {
+  const btn = document.getElementById('btnNew');
+  btn.disabled = true;
+  btn.innerHTML = `<span class="spinner"></span> En cours…`;
+  try {
+    await api('POST', '/api/bots/new');
+    toast('✅ Nouveau bot lancé', 'var(--success)');
+    log('Nouveau bot en cours de création…', 'info');
+  } catch(e) {
+    toast('❌ ' + e.message, 'var(--danger)');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M8 2v12M2 8h12"/></svg> Nouveau bot`;
+  }
+}
+
+async function runSession(email) {
+  try {
+    await api('POST', '/api/bots/session', { email });
+    toast('▶ Session lancée', 'var(--amber)');
+    log(`Session lancée : ${email}`, 'info');
+    setTimeout(refresh, 1000);
+  } catch(e) { toast('❌ ' + e.message, 'var(--danger)'); }
+}
+
+async function runAll(parallel) {
+  const maxParallel = parseInt(document.getElementById('maxParallel').value) || 3;
+  try {
+    const res = await api('POST', '/api/bots/run-all', { parallel, max_parallel: maxParallel });
+    toast('⚡ ' + res.msg, 'var(--amber)');
+    log(res.msg, 'info');
+    setTimeout(refresh, 1000);
+  } catch(e) { toast('❌ ' + e.message, 'var(--danger)'); }
+}
+
+async function deleteBot(email, username) {
+  if (!confirm(`Supprimer ${username} (${email}) ?`)) return;
+  try {
+    await api('DELETE', `/api/bots/${encodeURIComponent(email)}`);
+    toast('🗑 Supprimé', 'var(--muted)');
+    refresh();
+  } catch(e) { toast('❌ ' + e.message, 'var(--danger)'); }
+}
+
+function copyText(t) {
+  navigator.clipboard.writeText(t).then(() => toast('⎘ ' + t));
+}
+
+async function showBot(email) {
+  const bot = botsCache.find(b => b.email === email);
+  if (!bot) return;
+  document.getElementById('modalTitle').textContent = bot.username || 'Bot';
+  document.getElementById('modalBody').innerHTML = '<div class="empty">Chargement…</div>';
+  document.getElementById('modalBackdrop').classList.add('open');
+  try {
+    const data = await api('GET', `/api/bots/${encodeURIComponent(email)}/sessions`);
+    const sessions = data.sessions || [];
+    let html = `
+      <div class="detail-row"><span class="detail-label">Username</span><span class="detail-val">${esc(bot.username)}</span></div>
+      <div class="detail-row"><span class="detail-label">Email</span><span class="detail-val">${esc(bot.email)}</span></div>
+      <div class="detail-row"><span class="detail-label">Mot de passe</span><span class="detail-val">${esc(bot.password||'—')}</span></div>
+      <div class="detail-row"><span class="detail-label">Créé le</span><span class="detail-val">${bot.created_at?new Date(bot.created_at).toLocaleString('fr-FR'):'—'}</span></div>
+      <div class="detail-row"><span class="detail-label">Total paquets</span><span class="detail-val">${bot.total_paquets}</span></div>
+      <div class="detail-row"><span class="detail-label">Sessions</span><span class="detail-val">${sessions.length}</span></div>
+      <div style="margin-top:16px;display:flex;gap:8px">
+        <button class="btn-sm primary" onclick="closeModal();runSession('${esc(bot.email)}')">▶ Relancer</button>
+        <button class="btn-sm danger" onclick="closeModal();deleteBot('${esc(bot.email)}','${esc(bot.username)}')">✕ Supprimer</button>
+      </div>`;
+    if (sessions.length > 0) {
+      html += `<div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin:20px 0 8px">Historique (${sessions.length} sessions)</div>`;
+      [...sessions].reverse().forEach(s => {
+        const errCount = s.errors ? s.errors.length : 0;
+        const date = s.date ? new Date(s.date).toLocaleString('fr-FR') : '—';
+        const tag = s.type === 'migrated' ? ' <span style="color:var(--amber);font-size:10px">[migré]</span>' :
+                    s.type === 'reconnection' ? ' <span style="color:var(--accent);font-size:10px">[reconnexion]</span>' : '';
+        html += `<div class="session-item">
+          <div class="session-date">${date}${tag}</div>
+          <div style="display:flex;gap:16px;margin-top:4px">
+            <span style="color:var(--accent)">${s.paquets_opened||0} paquets</span>
+            <span style="color:${errCount>0?'var(--danger)':'var(--success)'}">${errCount>0?errCount+' erreur(s)':'✓ Sans erreur'}</span>
+          </div>
+          ${errCount>0?`<div style="color:var(--danger);font-size:11px;margin-top:4px">${esc(s.errors[0])}</div>`:''}
+        </div>`;
+      });
+    }
+    document.getElementById('modalBody').innerHTML = html;
+  } catch(e) {
+    document.getElementById('modalBody').innerHTML = `<div class="empty">Erreur : ${e.message}</div>`;
+  }
+}
+
+function closeModal(e) {
+  if (!e || e.target === document.getElementById('modalBackdrop'))
+    document.getElementById('modalBackdrop').classList.remove('open');
+}
+
+function connectSSE() {
+  const dot = document.getElementById('liveDot');
+  const es  = new EventSource(API + '/api/logs');
+  es.onopen = () => { dot.classList.add('on'); log('Stream connecté', 'success'); };
+  es.onmessage = e => {
+    try {
+      const entry = JSON.parse(e.data);
+      log(entry.msg, entry.level || '');
+      if (entry.msg.includes('terminé') || entry.msg.includes('mise à jour'))
+        setTimeout(refresh, 500);
+    } catch {}
+  };
+  es.onerror = () => {
+    dot.classList.remove('on');
+    setConn(false);
+    setTimeout(connectSSE, 5000);
+  };
+}
+
+async function refresh() {
+  await Promise.all([loadStats(), loadBots()]);
+}
+
+refresh();
+setInterval(refresh, 10000);
+connectSSE();
+</script>
+</body>
+</html>

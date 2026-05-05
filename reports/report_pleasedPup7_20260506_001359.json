@@ -1,0 +1,41 @@
+{
+  "bot": {
+    "id": "20260506001312",
+    "username": "pleasedPup7",
+    "email": "pleasedPup7_63pfgtk3@guerrillamailblock.com",
+    "password": "TestPassword123!",
+    "created_at": "2026-05-06T00:13:12.915210",
+    "sessions": [
+      {
+        "date": "2026-05-06T00:12:57.800379",
+        "actions": [
+          "✅ Compte créé et vérifié",
+          "✅ Screenshot post-login",
+          "✅ 10 paquets ouverts",
+          "✅ Screenshot collection"
+        ],
+        "errors": [],
+        "paquets_opened": 10,
+        "screenshots": [
+          "screenshots/login_pleasedPup7_20260506_001312.png",
+          "screenshots/collection_pleasedPup7_20260506_001359.png"
+        ]
+      }
+    ]
+  },
+  "last_session": {
+    "date": "2026-05-06T00:12:57.800379",
+    "actions": [
+      "✅ Compte créé et vérifié",
+      "✅ Screenshot post-login",
+      "✅ 10 paquets ouverts",
+      "✅ Screenshot collection"
+    ],
+    "errors": [],
+    "paquets_opened": 10,
+    "screenshots": [
+      "screenshots/login_pleasedPup7_20260506_001312.png",
+      "screenshots/collection_pleasedPup7_20260506_001359.png"
+    ]
+  }
+}

@@ -21,6 +21,592 @@
             "screenshots/login_mereLapwing8_20260505_230008.png",
             "screenshots/collection_mereLapwing8_20260505_230056.png"
           ]
+        },
+        {
+          "date": "2026-05-05T23:31:41.226222",
+          "type": "reconnection",
+          "actions": [
+            "✅ Connexion réussie",
+            "✅ 3 paquets ouverts",
+            "✅ Screenshot collection"
+          ],
+          "errors": [],
+          "paquets_opened": 3,
+          "screenshots": [
+            "screenshots/login_mereLapwing8_20260505_233145.png",
+            "screenshots/collection_mereLapwing8_20260505_233202.png"
+          ]
+        },
+        {
+          "date": "2026-05-05T23:46:27.368932",
+          "type": "reconnection",
+          "actions": [],
+          "errors": [
+            "❌ Erreur fatale : Locator.wait_for: Timeout 15000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"link\", name=\"Paquets\") to be visible\n"
+          ],
+          "paquets_opened": 0,
+          "screenshots": [
+            "screenshots/erreur_20260505_234644.png"
+          ]
+        },
+        {
+          "date": "2026-05-06T00:11:20.253530",
+          "type": "reconnection",
+          "actions": [
+            "✅ Connexion réussie",
+            "✅ 4 paquets ouverts",
+            "✅ Screenshot collection"
+          ],
+          "errors": [],
+          "paquets_opened": 4,
+          "screenshots": [
+            "screenshots/login_mereLapwing8_20260506_001126.png",
+            "screenshots/collection_mereLapwing8_20260506_001145.png"
+          ]
+        },
+        {
+          "date": "2026-05-06T00:19:45.778506",
+          "type": "reconnection",
+          "actions": [],
+          "errors": [
+            "❌ Erreur fatale : Locator.wait_for: Timeout 15000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"link\", name=\"Paquets\") to be visible\n"
+          ],
+          "paquets_opened": 0,
+          "screenshots": [
+            "screenshots/erreur_20260506_002002.png"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "20260505222440",
+      "username": "euphoricSeagull8",
+      "email": "euphoricSeagull8_x9hwhtrm@guerrillamailblock.com",
+      "password": "TestPassword123!",
+      "created_at": "2026-05-05T22:24:40",
+      "sessions": [
+        {
+          "date": "2026-05-05T22:24:40",
+          "type": "migrated",
+          "source_file": "report_20260505_222458.json",
+          "actions": [
+            "✅ Navigation vers la page de login",
+            "✅ Connexion effectuée",
+            "✅ Screenshot pris"
+          ],
+          "errors": [
+            "❌ Erreur : invalid literal for int() with base 10: 'Wiki'"
+          ],
+          "paquets_opened": 0,
+          "screenshots": []
+        },
+        {
+          "date": "2026-05-05T23:46:44.085874",
+          "type": "reconnection",
+          "actions": [
+            "✅ Connexion réussie",
+            "✅ 10 paquets ouverts",
+            "✅ Screenshot collection"
+          ],
+          "errors": [],
+          "paquets_opened": 10,
+          "screenshots": [
+            "screenshots/login_euphoricSeagull8_20260505_234648.png",
+            "screenshots/collection_euphoricSeagull8_20260505_234724.png"
+          ]
+        },
+        {
+          "date": "2026-05-06T00:20:02.543335",
+          "type": "reconnection",
+          "actions": [
+            "✅ Connexion réussie",
+            "✅ 3 paquets ouverts",
+            "✅ Screenshot collection"
+          ],
+          "errors": [],
+          "paquets_opened": 3,
+          "screenshots": [
+            "screenshots/login_euphoricSeagull8_20260506_002006.png",
+            "screenshots/collection_euphoricSeagull8_20260506_002021.png"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "20260505222815",
+      "username": "somberDoughnut8",
+      "email": "somberDoughnut8_8c7xs59a@guerrillamailblock.com",
+      "password": "TestPassword123!",
+      "created_at": "2026-05-05T22:28:15",
+      "sessions": [
+        {
+          "date": "2026-05-05T22:28:15",
+          "type": "migrated",
+          "source_file": "report_20260505_222833.json",
+          "actions": [
+            "✅ Navigation vers la page de login",
+            "✅ Connexion effectuée",
+            "✅ Screenshot pris"
+          ],
+          "errors": [
+            "❌ Erreur : invalid literal for int() with base 10: 'Wiki'"
+          ],
+          "paquets_opened": 0,
+          "screenshots": []
+        },
+        {
+          "date": "2026-05-05T23:47:24.641089",
+          "type": "reconnection",
+          "actions": [
+            "✅ Connexion réussie",
+            "✅ 10 paquets ouverts",
+            "✅ Screenshot collection"
+          ],
+          "errors": [],
+          "paquets_opened": 10,
+          "screenshots": [
+            "screenshots/login_somberDoughnut8_20260505_234728.png",
+            "screenshots/collection_somberDoughnut8_20260505_234806.png"
+          ]
+        },
+        {
+          "date": "2026-05-06T00:20:21.506604",
+          "type": "reconnection",
+          "actions": [
+            "✅ Connexion réussie",
+            "✅ 3 paquets ouverts",
+            "✅ Screenshot collection"
+          ],
+          "errors": [],
+          "paquets_opened": 3,
+          "screenshots": [
+            "screenshots/login_somberDoughnut8_20260506_002025.png",
+            "screenshots/collection_somberDoughnut8_20260506_002040.png"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "20260505223136",
+      "username": "holisticAntelope3",
+      "email": "holisticAntelope3_3otqok3p@guerrillamailblock.com",
+      "password": "TestPassword123!",
+      "created_at": "2026-05-05T22:31:36",
+      "sessions": [
+        {
+          "date": "2026-05-05T22:31:36",
+          "type": "migrated",
+          "source_file": "report_20260505_223151.json",
+          "actions": [
+            "✅ Navigation vers la page de login",
+            "✅ Connexion effectuée",
+            "✅ Screenshot pris"
+          ],
+          "errors": [
+            "❌ Erreur : invalid literal for int() with base 10: 'Wiki'"
+          ],
+          "paquets_opened": 0,
+          "screenshots": []
+        },
+        {
+          "date": "2026-05-05T23:48:06.469837",
+          "type": "reconnection",
+          "actions": [
+            "✅ Connexion réussie",
+            "✅ 10 paquets ouverts",
+            "✅ Screenshot collection"
+          ],
+          "errors": [],
+          "paquets_opened": 10,
+          "screenshots": [
+            "screenshots/login_holisticAntelope3_20260505_234810.png",
+            "screenshots/collection_holisticAntelope3_20260505_234848.png"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "20260505223239",
+      "username": "somberSmelt3",
+      "email": "somberSmelt3_udl2pjcq@guerrillamailblock.com",
+      "password": "TestPassword123!",
+      "created_at": "2026-05-05T22:32:39",
+      "sessions": [
+        {
+          "date": "2026-05-05T22:32:39",
+          "type": "migrated",
+          "source_file": "report_20260505_223300.json",
+          "actions": [
+            "✅ Navigation vers la page de login",
+            "✅ Connexion effectuée",
+            "✅ Screenshot pris"
+          ],
+          "errors": [
+            "❌ Erreur : invalid literal for int() with base 10: 'Wiki'"
+          ],
+          "paquets_opened": 0,
+          "screenshots": []
+        },
+        {
+          "date": "2026-05-05T23:48:48.219151",
+          "type": "reconnection",
+          "actions": [
+            "✅ Connexion réussie",
+            "✅ 10 paquets ouverts",
+            "✅ Screenshot collection"
+          ],
+          "errors": [],
+          "paquets_opened": 10,
+          "screenshots": [
+            "screenshots/login_somberSmelt3_20260505_234852.png",
+            "screenshots/collection_somberSmelt3_20260505_234927.png"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "20260505223502",
+      "username": "giddyUnicorn3",
+      "email": "giddyUnicorn3_f4i63mrm@guerrillamailblock.com",
+      "password": "TestPassword123!",
+      "created_at": "2026-05-05T22:35:02",
+      "sessions": [
+        {
+          "date": "2026-05-05T22:35:02",
+          "type": "migrated",
+          "source_file": "report_20260505_223520.json",
+          "actions": [
+            "✅ Navigation vers la page de login",
+            "✅ Connexion effectuée",
+            "✅ Screenshot pris"
+          ],
+          "errors": [
+            "❌ Erreur : invalid literal for int() with base 10: 'Wiki'"
+          ],
+          "paquets_opened": 0,
+          "screenshots": []
+        },
+        {
+          "date": "2026-05-05T23:49:27.536743",
+          "type": "reconnection",
+          "actions": [
+            "✅ Connexion réussie",
+            "✅ 10 paquets ouverts",
+            "✅ Screenshot collection"
+          ],
+          "errors": [],
+          "paquets_opened": 10,
+          "screenshots": [
+            "screenshots/login_giddyUnicorn3_20260505_234931.png",
+            "screenshots/collection_giddyUnicorn3_20260505_235010.png"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "20260505223641",
+      "username": "pluckySeahorse6",
+      "email": "pluckySeahorse6_f76eh5xl@guerrillamailblock.com",
+      "password": "TestPassword123!",
+      "created_at": "2026-05-05T22:36:41",
+      "sessions": [
+        {
+          "date": "2026-05-05T22:36:41",
+          "type": "migrated",
+          "source_file": "report_20260505_223659.json",
+          "actions": [
+            "✅ Navigation vers la page de login",
+            "✅ Connexion effectuée",
+            "✅ Screenshot pris"
+          ],
+          "errors": [
+            "❌ Erreur : Locator.wait_for: Error: strict mode violation: locator(\"span.text-\\\\[var\\\\(--color-accent\\\\)\\\\]\") resolved to 3 elements:\n    1) <span class=\"text-[var(--color-accent)]\">Wiki</span> aka get_by_role(\"link\", name=\"WikiMasters\")\n    2) <span class=\"text-lg md:text-xl font-bold text-[var(--color-accent)] drop-shadow-md\">Ouvrir</span> aka get_by_role(\"button\", name=\"Ouvrir un paquet Ouvrir\")\n    3) <span class=\"text-[var(--color-accent)]\">10</span> aka get_by_text(\"10\", exact=True)\n\nCall log:\n  - waiting for locator(\"span.text-\\\\[var\\\\(--color-accent\\\\)\\\\]\") to be visible\n"
+          ],
+          "paquets_opened": 0,
+          "screenshots": []
+        },
+        {
+          "date": "2026-05-05T23:50:10.685042",
+          "type": "reconnection",
+          "actions": [
+            "✅ Connexion réussie",
+            "✅ 10 paquets ouverts",
+            "✅ Screenshot collection"
+          ],
+          "errors": [],
+          "paquets_opened": 10,
+          "screenshots": [
+            "screenshots/login_pluckySeahorse6_20260505_235014.png",
+            "screenshots/collection_pluckySeahorse6_20260505_235050.png"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "20260505223905",
+      "username": "ferventSausage3",
+      "email": "ferventSausage3_04rj2kkq@guerrillamailblock.com",
+      "password": "TestPassword123!",
+      "created_at": "2026-05-05T22:39:05",
+      "sessions": [
+        {
+          "date": "2026-05-05T22:39:05",
+          "type": "migrated",
+          "source_file": "report_20260505_223952.json",
+          "actions": [
+            "✅ Navigation vers la page de login",
+            "✅ Connexion effectuée",
+            "✅ Screenshot pris"
+          ],
+          "errors": [
+            "❌ Erreur : Locator.wait_for: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator(\".flex.items-center.gap-4 > button:nth-child(3)\") to be visible\n"
+          ],
+          "paquets_opened": 0,
+          "screenshots": []
+        },
+        {
+          "date": "2026-05-05T23:50:50.498028",
+          "type": "reconnection",
+          "actions": [
+            "✅ Connexion réussie",
+            "✅ 8 paquets ouverts",
+            "✅ Screenshot collection"
+          ],
+          "errors": [],
+          "paquets_opened": 8,
+          "screenshots": [
+            "screenshots/login_ferventSausage3_20260505_235053.png",
+            "screenshots/collection_ferventSausage3_20260505_235127.png"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "20260505224147",
+      "username": "alertCockatoo1",
+      "email": "alertCockatoo1_dyttrghd@guerrillamailblock.com",
+      "password": "TestPassword123!",
+      "created_at": "2026-05-05T22:41:47",
+      "sessions": [
+        {
+          "date": "2026-05-05T22:41:47",
+          "type": "migrated",
+          "source_file": "report_20260505_224211.json",
+          "actions": [
+            "✅ Navigation vers la page de login",
+            "✅ Connexion effectuée",
+            "✅ Screenshot pris"
+          ],
+          "errors": [
+            "❌ Erreur : Locator.wait_for: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator(\".flex.items-center.gap-4 > button:nth-child(3)\") to be visible\n"
+          ],
+          "paquets_opened": 0,
+          "screenshots": []
+        },
+        {
+          "date": "2026-05-05T23:51:27.580790",
+          "type": "reconnection",
+          "actions": [],
+          "errors": [
+            "❌ Erreur fatale : Locator.wait_for: Timeout 15000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"link\", name=\"Paquets\") to be visible\n    - waiting for\" https://www.wiki-masters.com/login?\" navigation to finish...\n    - navigated to \"https://www.wiki-masters.com/login?\"\n"
+          ],
+          "paquets_opened": 0,
+          "screenshots": [
+            "screenshots/erreur_20260505_235143.png"
+          ]
+        },
+        {
+          "date": "2026-05-06T00:11:55.996422",
+          "type": "reconnection",
+          "actions": [
+            "✅ Connexion réussie",
+            "✅ 10 paquets ouverts",
+            "✅ Screenshot collection"
+          ],
+          "errors": [],
+          "paquets_opened": 10,
+          "screenshots": [
+            "screenshots/login_alertCockatoo1_20260506_001200.png",
+            "screenshots/collection_alertCockatoo1_20260506_001244.png"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "20260505224249",
+      "username": "cautiousFalcon5",
+      "email": "cautiousFalcon5_qk8omsuv@guerrillamailblock.com",
+      "password": "TestPassword123!",
+      "created_at": "2026-05-05T22:42:49",
+      "sessions": [
+        {
+          "date": "2026-05-05T22:42:49",
+          "type": "migrated",
+          "source_file": "report_20260505_224353.json",
+          "actions": [
+            "✅ Navigation vers la page de login",
+            "✅ Connexion effectuée",
+            "✅ Screenshot pris"
+          ],
+          "errors": [],
+          "paquets_opened": 0,
+          "screenshots": []
+        },
+        {
+          "date": "2026-05-05T23:51:43.754614",
+          "type": "reconnection",
+          "actions": [
+            "✅ Connexion réussie",
+            "✅ 6 paquets ouverts",
+            "✅ Screenshot collection"
+          ],
+          "errors": [],
+          "paquets_opened": 6,
+          "screenshots": [
+            "screenshots/login_cautiousFalcon5_20260505_235147.png",
+            "screenshots/collection_cautiousFalcon5_20260505_235214.png"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "20260505224721",
+      "username": "mereDove5",
+      "email": "mereDove5_pxfkqdw6@guerrillamailblock.com",
+      "password": "TestPassword123!",
+      "created_at": "2026-05-05T22:47:21",
+      "sessions": [
+        {
+          "date": "2026-05-05T22:47:21",
+          "type": "migrated",
+          "source_file": "report_20260505_224752.json",
+          "actions": [
+            "✅ Navigation vers la page de login",
+            "✅ Connexion effectuée",
+            "✅ Screenshot pris"
+          ],
+          "errors": [
+            "❌ Erreur : Locator.wait_for: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator(\".flex.items-center.gap-4 > button:nth-child(3)\") to be visible\n"
+          ],
+          "paquets_opened": 0,
+          "screenshots": []
+        },
+        {
+          "date": "2026-05-05T23:52:14.126148",
+          "type": "reconnection",
+          "actions": [
+            "✅ Connexion réussie",
+            "✅ 10 paquets ouverts",
+            "✅ Screenshot collection"
+          ],
+          "errors": [],
+          "paquets_opened": 10,
+          "screenshots": [
+            "screenshots/login_mereDove5_20260505_235218.png",
+            "screenshots/collection_mereDove5_20260505_235254.png"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "20260505224827",
+      "username": "grizzledGranola0",
+      "email": "grizzledGranola0_qp3sren1@guerrillamailblock.com",
+      "password": "TestPassword123!",
+      "created_at": "2026-05-05T22:48:27",
+      "sessions": [
+        {
+          "date": "2026-05-05T22:48:27",
+          "type": "migrated",
+          "source_file": "report_20260505_224858.json",
+          "actions": [
+            "✅ Navigation vers la page de login",
+            "✅ Connexion effectuée",
+            "✅ Screenshot pris"
+          ],
+          "errors": [
+            "❌ Erreur : Locator.wait_for: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator(\".flex.items-center.gap-4 > button:nth-child(3)\") to be visible\n"
+          ],
+          "paquets_opened": 0,
+          "screenshots": []
+        },
+        {
+          "date": "2026-05-05T23:52:55.059569",
+          "type": "reconnection",
+          "actions": [
+            "✅ Connexion réussie",
+            "✅ 10 paquets ouverts",
+            "✅ Screenshot collection"
+          ],
+          "errors": [],
+          "paquets_opened": 10,
+          "screenshots": [
+            "screenshots/login_grizzledGranola0_20260505_235259.png",
+            "screenshots/collection_grizzledGranola0_20260505_235334.png"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "20260505224937",
+      "username": "cynicalWidgeon0",
+      "email": "cynicalWidgeon0_zxf4nre1@guerrillamailblock.com",
+      "password": "TestPassword123!",
+      "created_at": "2026-05-05T22:49:37",
+      "sessions": [
+        {
+          "date": "2026-05-05T22:49:37",
+          "type": "migrated",
+          "source_file": "report_20260505_225017.json",
+          "actions": [
+            "✅ Navigation vers la page de login",
+            "✅ Connexion effectuée",
+            "✅ Screenshot pris"
+          ],
+          "errors": [
+            "❌ Erreur : Locator.wait_for: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator(\".flex.items-center.gap-4 > button:nth-child(3)\") to be visible\n"
+          ],
+          "paquets_opened": 0,
+          "screenshots": []
+        },
+        {
+          "date": "2026-05-05T23:53:34.825265",
+          "type": "reconnection",
+          "actions": [
+            "✅ Connexion réussie",
+            "✅ 10 paquets ouverts",
+            "✅ Screenshot collection"
+          ],
+          "errors": [],
+          "paquets_opened": 10,
+          "screenshots": [
+            "screenshots/login_cynicalWidgeon0_20260505_235338.png",
+            "screenshots/collection_cynicalWidgeon0_20260505_235418.png"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "20260506001312",
+      "username": "pleasedPup7",
+      "email": "pleasedPup7_63pfgtk3@guerrillamailblock.com",
+      "password": "TestPassword123!",
+      "created_at": "2026-05-06T00:13:12.915210",
+      "sessions": [
+        {
+          "date": "2026-05-06T00:12:57.800379",
+          "actions": [
+            "✅ Compte créé et vérifié",
+            "✅ Screenshot post-login",
+            "✅ 10 paquets ouverts",
+            "✅ Screenshot collection"
+          ],
+          "errors": [],
+          "paquets_opened": 10,
+          "screenshots": [
+            "screenshots/login_pleasedPup7_20260506_001312.png",
+            "screenshots/collection_pleasedPup7_20260506_001359.png"
+          ]
         }
       ]
     }
