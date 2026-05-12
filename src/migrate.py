@@ -1,37 +1,29 @@
-"""
-migrate.py — Convertit les anciens rapports JSON vers bots_db.json
-
-Ancien format (report_*.json) :
-  { "date": "...", "email_utilisé": "...", "actions": [...], "erreurs": [...] }
-
-Nouveau format (bots_db.json) :
-  { "bots": [{ "id", "username", "email", "password", "created_at", "sessions": [...] }] }
-
-Usage :
-  python migrate.py                         # scanne ./reports/ automatiquement
-  python migrate.py --dir /chemin/rapports  # dossier personnalisé
-  python migrate.py --file report_x.json    # fichier unique
-  python migrate.py --dry-run               # aperçu sans écrire
-"""
-
 import json
 import os
-import re
-import argparse
+import random
 from datetime import datetime
-from pathlib import Path
 
+from playwright.sync_api import Page
+from playwright.sync_api import TimeoutError as PlaywrightTimeout
+from playwright.sync_api import sync_playwright
 
-REPORTS_DIR  = "reports"
+# ─── Config ───────────────────────────────────────────────────────────────────
+
+SITE_URL = os.environ.get("SITE_URL", "https://www.wiki-masters.com/")
+LOGIN_URL = SITE_URL + "login"
+HEADLESS = os.environ.get("HEADLESS", "true").lower() == "true"
+REPORTS_DIR = "reports"
+SCREENSHOTS_DIR = "screenshots"
+COOKIES_DIR = "cookies"
 BOTS_DB_PATH = os.path.join(REPORTS_DIR, "bots_db.json")
-DEFAULT_PASSWORD = "TestPassword123!"
 
 
-# ─── Helpers ──────────────────────────────────────────────────────────────────
+# ─── DB ───────────────────────────────────────────────────────────────────────
+
 
 def load_bots_db() -> dict:
     if os.path.exists(BOTS_DB_PATH):
-        with open(BOTS_DB_PATH, "r", encoding="utf-8") as f:
+        with open(BOTS_DB_PATH, encoding="utf-8") as f:
             return json.load(f)
     return {"bots": []}
 
@@ -42,185 +34,310 @@ def save_bots_db(db: dict):
         json.dump(db, f, ensure_ascii=False, indent=2)
 
 
-def is_old_format(data: dict) -> bool:
-    """Détecte l'ancien format via la clé 'email_utilisé'."""
-    return "email_utilisé" in data and "bots" not in data
+# ─── Navigation ───────────────────────────────────────────────────────────────
 
 
-def is_new_format(data: dict) -> bool:
-    return "bots" in data
+def safe_goto(page: Page, url: str, retries: int = 3, timeout: int = 15000):
+    for attempt in range(1, retries + 1):
+        try:
+            page.goto(url, timeout=timeout, wait_until="domcontentloaded")
+            if page.locator("text=This page couldn't load").is_visible():
+                raise Exception("Page load error detected")
+            return
+        except Exception as e:
+            print(f"⚠️  Navigation attempt {attempt}/{retries} failed: {e}")
+            if attempt == retries:
+                raise
+            page.wait_for_timeout(2000 * attempt)
 
 
-def extract_username_from_email(email: str) -> str:
-    """Extrait la partie avant le _ ou @ pour deviner le username."""
-    local = email.split("@")[0]          # ex: euphoricSeagull8_x9hwhtrm
-    username = local.split("_")[0]       # ex: euphoricSeagull8
-    return username or local
+def screenshot(page: Page, name: str) -> str:
+    os.makedirs(SCREENSHOTS_DIR, exist_ok=True)
+    path = os.path.join(
+        SCREENSHOTS_DIR, f"{name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+    )
+    page.screenshot(path=path)
+    return path
 
 
-def parse_old_date(date_str: str) -> str:
-    """Convertit '2026-05-05 22:24:40' → ISO 8601."""
-    try:
-        dt = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
-        return dt.isoformat()
-    except Exception:
-        return datetime.now().isoformat()
+def save_cookies(context, username: str) -> str:
+    """Sauvegarde le storage state complet (cookies + localStorage)."""
+    os.makedirs(COOKIES_DIR, exist_ok=True)
+    path = os.path.join(COOKIES_DIR, f"{username}.json")
+    context.storage_state(path=path)
+    print(f"🍪 Cookies sauvegardés → {path}")
+    return path
 
 
-def paquets_from_actions(actions: list) -> int:
-    """Tente de lire le nombre de paquets depuis les actions loggées."""
-    for action in actions:
-        match = re.search(r"(\d+)\s+paquets?\s+ouverts?", action, re.IGNORECASE)
-        if match:
-            return int(match.group(1))
-    return 0
+def load_cookies_context(p, bot: dict):
+    """
+    Crée un browser context en restaurant les cookies si disponibles.
+    Retourne (browser, context, page).
+    Priorité : cookies_path du bot → cookies/{username}.json → session vierge
+    """
+    browser = p.chromium.launch(headless=HEADLESS)
+
+    cookies_path = bot.get("cookies_path")
+    if not cookies_path or not os.path.exists(cookies_path):
+        # Fallback sur le fichier par nom
+        fallback = os.path.join(COOKIES_DIR, f"{bot.get('username', '')}.json")
+        cookies_path = fallback if os.path.exists(fallback) else None
+
+    if cookies_path:
+        print(f"🍪 Restauration cookies depuis {cookies_path}")
+        context = browser.new_context(storage_state=cookies_path)
+    else:
+        print("🍪 Aucun cookie trouvé — connexion via email/mdp")
+        context = browser.new_context()
+
+    page = context.new_page()
+    return browser, context, page
 
 
-def already_imported(db: dict, email: str) -> bool:
-    return any(b.get("email") == email for b in db.get("bots", []))
+# ─── Login ────────────────────────────────────────────────────────────────────
 
 
-# ─── Conversion ───────────────────────────────────────────────────────────────
+def login(page: Page, context, bot: dict):
+    """
+    Tente d'abord d'utiliser les cookies existants.
+    Si la session est expirée ou absente, bascule sur email/mdp.
+    """
+    email = bot["email"]
+    password = bot["password"]
+    username = bot.get("username", email)
 
-def convert_old_report(data: dict, source_file: str = "") -> dict:
-    """Convertit un ancien rapport en entrée bot au nouveau format."""
-    email     = data.get("email_utilisé", "")
-    date_raw  = data.get("date", "")
-    actions   = data.get("actions", [])
-    erreurs   = data.get("erreurs", [])
+    # Aller sur le site — si les cookies sont valides, on sera déjà connecté
+    safe_goto(page, SITE_URL)
 
-    date_iso  = parse_old_date(date_raw)
-    username  = extract_username_from_email(email)
-    bot_id    = datetime.fromisoformat(date_iso).strftime("%Y%m%d%H%M%S")
+    already_logged = page.get_by_role("link", name="Paquets").is_visible()
+
+    if already_logged:
+        print("✅ Session restaurée via cookies — pas besoin de se reconnecter")
+        return
+
+    # Cookies expirés ou absents → login classique
+    print(f"🔐 Cookies invalides — connexion avec {email}…")
+    safe_goto(page, LOGIN_URL)
+
+    page.get_by_role("textbox", name="Adresse courriel").fill(email)
+    page.get_by_role("textbox", name="Mot de passe").fill(password)
+    page.get_by_role("button", name="Se connecter").click()
+
+    page.get_by_role("link", name="Paquets").wait_for(state="visible", timeout=15000)
+    print("✅ Connecté via email/mdp")
+
+    # Sauvegarder les nouveaux cookies
+    save_cookies(context, username)
+
+
+# ─── Paquets ──────────────────────────────────────────────────────────────────
+
+
+def get_counter_value(page: Page) -> int:
+    locator = page.locator(
+        '//span[contains(@class, "color-accent")'
+        " and string-length(normalize-space(text())) <= 2"
+        ' and translate(normalize-space(text()), "0123456789", "") = ""]'
+    )
+    locator.wait_for(state="visible", timeout=10000)
+    return int(locator.inner_text().strip())
+
+
+def open_paquet(page: Page):
+    btn_open = page.get_by_role("button", name="Ouvrir un paquet Ouvrir")
+    btn_next = page.locator(".flex.items-center.gap-4 > button:nth-child(3)")
+    btn_continue = page.get_by_role("button", name="Continuer")
+
+    btn_open.wait_for(state="visible", timeout=20000)
+    btn_open.click()
+
+    for _ in range(4):
+        page.wait_for_timeout(random.randint(50, 250))
+        btn_next.wait_for(state="visible", timeout=10000)
+        btn_next.click()
+
+    page.wait_for_timeout(random.randint(50, 200))
+    btn_continue.click()
+
+
+def open_all_paquets(page: Page) -> dict:
+    page.get_by_role("link", name="Paquets").wait_for(state="visible", timeout=10000)
+    page.get_by_role("link", name="Paquets").click()
+    page.wait_for_timeout(1000)
+
+    paquets_opened = 0
+    errors = []
+
+    while True:
+        try:
+            counter = get_counter_value(page)
+            print(f"📦 Paquets restants : {counter}")
+            if counter <= 0:
+                print("✅ Tous les paquets ouverts")
+                break
+
+            open_paquet(page)
+            paquets_opened += 1
+            page.wait_for_timeout(100)
+
+        except PlaywrightTimeout as e:
+            msg = f"Timeout paquet #{paquets_opened + 1}: {e}"
+            errors.append(msg)
+            print(f"⚠️  {msg}")
+            try:
+                safe_goto(page, page.url)
+                page.wait_for_timeout(2000)
+            except Exception:
+                break
+
+        except Exception as e:
+            msg = f"Erreur paquet #{paquets_opened + 1}: {e}"
+            errors.append(msg)
+            print(f"❌ {msg}")
+            break
+
+    return {"paquets_opened": paquets_opened, "errors": errors}
+
+
+# ─── Session runner ───────────────────────────────────────────────────────────
+
+
+def run_session(bot_index: int = None, email: str = None):
+    """
+    Relance une session pour un bot existant.
+    Utilise bot_index (position dans bots_db) ou email pour identifier le bot.
+    Si ni l'un ni l'autre n'est fourni, relance le dernier bot enregistré.
+    """
+    db = load_bots_db()
+    bots = db.get("bots", [])
+
+    if not bots:
+        print("❌ Aucun bot dans bots_db.json — lance d'abord bot.py")
+        return
+
+    # Trouver le bot cible
+    if email:
+        bot = next((b for b in bots if b["email"] == email), None)
+        if not bot:
+            print(f"❌ Aucun bot avec l'email : {email}")
+            return
+        bot_index = bots.index(bot)
+    elif bot_index is not None:
+        if bot_index < 0 or bot_index >= len(bots):
+            print(f"❌ Index invalide : {bot_index} (0–{len(bots) - 1} disponibles)")
+            return
+        bot = bots[bot_index]
+    else:
+        bot_index = len(bots) - 1
+        bot = bots[bot_index]
+
+    print(f"🤖 Bot cible : {bot['username']} ({bot['email']})")
 
     session = {
-        "date":           date_iso,
-        "type":           "migrated",
-        "source_file":    os.path.basename(source_file),
-        "actions":        actions,
-        "errors":         erreurs,
-        "paquets_opened": paquets_from_actions(actions),
-        "screenshots":    []
+        "date": datetime.now().isoformat(),
+        "type": "reconnection",
+        "actions": [],
+        "errors": [],
+        "paquets_opened": 0,
+        "screenshots": [],
     }
 
-    bot = {
-        "id":         bot_id,
-        "username":   username,
-        "email":      email,
-        "password":   DEFAULT_PASSWORD,
-        "created_at": date_iso,
-        "sessions":   [session]
-    }
+    with sync_playwright() as p:
+        browser, context, page = load_cookies_context(p, bot)
 
-    return bot
+        try:
+            # 1. Login (cookies ou email/mdp)
+            login(page, context, bot)
+            session["actions"].append("✅ Connexion réussie")
 
+            path = screenshot(page, f"login_{bot['username']}")
+            session["screenshots"].append(path)
 
-# ─── File processing ──────────────────────────────────────────────────────────
+            # 2. Ouvrir tous les paquets
+            stats = open_all_paquets(page)
+            session["paquets_opened"] = stats["paquets_opened"]
+            session["errors"].extend(stats["errors"])
+            session["actions"].append(f"✅ {stats['paquets_opened']} paquets ouverts")
 
-def process_file(path: str, db: dict, dry_run: bool) -> tuple[int, int]:
-    """
-    Traite un fichier JSON.
-    Retourne (imported, skipped).
-    """
-    imported = skipped = 0
+            # 3. Screenshot collection
+            page.get_by_role("link", name="Collection").click()
+            path = screenshot(page, f"collection_{bot['username']}")
+            session["screenshots"].append(path)
+            session["actions"].append("✅ Screenshot collection")
 
-    try:
-        with open(path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-    except Exception as e:
-        print(f"  ⚠️  Lecture impossible ({os.path.basename(path)}) : {e}")
-        return 0, 0
+            # 4. Sauvegarder les cookies mis à jour
+            cookies_path = save_cookies(context, bot["username"])
+            db["bots"][bot_index]["cookies_path"] = cookies_path
+            session["actions"].append("✅ Cookies mis à jour")
 
-    # Fichier au nouveau format avec plusieurs bots (bots_db)
-    if is_new_format(data):
-        for bot in data.get("bots", []):
-            email = bot.get("email", "")
-            if already_imported(db, email):
-                print(f"  ⏭  Déjà présent : {email}")
-                skipped += 1
-            else:
-                if not dry_run:
-                    db["bots"].append(bot)
-                print(f"  ✅ Importé (nouveau format) : {bot.get('username')} — {email}")
-                imported += 1
-        return imported, skipped
+        except Exception as e:
+            msg = f"❌ Erreur fatale : {e}"
+            session["errors"].append(msg)
+            print(msg)
+            try:
+                path = screenshot(page, "erreur")
+                session["screenshots"].append(path)
+            except Exception:
+                pass
 
-    # Ancien format (rapport individuel)
-    if is_old_format(data):
-        email = data.get("email_utilisé", "")
-        if already_imported(db, email):
-            print(f"  ⏭  Déjà présent : {email}")
-            return 0, 1
+        finally:
+            context.close()
+            browser.close()
 
-        bot = convert_old_report(data, source_file=path)
-        if not dry_run:
-            db["bots"].append(bot)
-        print(f"  ✅ Converti : {bot['username']} — {email}"
-              f"  ({bot['sessions'][0]['paquets_opened']} paquets, "
-              f"{len(bot['sessions'][0]['errors'])} erreur(s))")
-        return 1, 0
-
-    print(f"  ❓ Format non reconnu : {os.path.basename(path)}")
-    return 0, 0
-
-
-def scan_directory(directory: str, db: dict, dry_run: bool) -> tuple[int, int]:
-    """Scanne un dossier et traite tous les JSON sauf bots_db.json."""
-    total_imported = total_skipped = 0
-    files = sorted(Path(directory).glob("*.json"))
-
-    if not files:
-        print(f"Aucun fichier JSON trouvé dans {directory}")
-        return 0, 0
-
-    for path in files:
-        if path.name == "bots_db.json":
-            continue  # ne pas importer la DB elle-même
-        print(f"\n📄 {path.name}")
-        imp, skip = process_file(str(path), db, dry_run)
-        total_imported += imp
-        total_skipped  += skip
-
-    return total_imported, total_skipped
-
-
-# ─── Main ─────────────────────────────────────────────────────────────────────
-
-parser = argparse.ArgumentParser(description="Migration anciens rapports → bots_db.json")
-parser.add_argument("--dir",     type=str, default=REPORTS_DIR, help="Dossier à scanner")
-parser.add_argument("--file",    type=str, help="Fichier unique à importer")
-parser.add_argument("--dry-run", action="store_true", help="Aperçu sans écrire")
-args = parser.parse_args()
-
-print("=" * 55)
-print("  Migration WikiMasters → bots_db.json")
-if args.dry_run:
-    print("  MODE DRY-RUN : aucune écriture")
-print("=" * 55)
-
-db = load_bots_db()
-bots_before = len(db.get("bots", []))
-print(f"\n📂 Base actuelle : {bots_before} bot(s)\n")
-
-if args.file:
-    print(f"📄 Fichier unique : {args.file}")
-    imp, skip = process_file(args.file, db, args.dry_run)
-else:
-    print(f"📁 Scan de : {args.dir}")
-    imp, skip = scan_directory(args.dir, db, args.dry_run)
-
-# Sauvegarde
-if not args.dry_run and imp > 0:
+    # Mise à jour de la base de données
+    db["bots"][bot_index].setdefault("sessions", []).append(session)
     save_bots_db(db)
-    print(f"\n💾 bots_db.json mis à jour")
+    print(f"💾 Base de données mise à jour ({BOTS_DB_PATH})")
 
-# Résumé
-print(f"\n{'─' * 55}")
-print(f"  Importés  : {imp}")
-print(f"  Ignorés   : {skip} (déjà présents)")
-print(f"  Total DB  : {len(db.get('bots', []))} bot(s)")
-print(f"{'─' * 55}\n")
+    # 5. Résumé console
+    print("\n📋 RÉSUMÉ DE SESSION :")
+    for action in session["actions"]:
+        print(f"  {action}")
+    if session["errors"]:
+        print("\n⚠️  ERREURS :")
+        for err in session["errors"]:
+            print(f"  {err}")
+    print(f"\n📦 Paquets ouverts : {session['paquets_opened']}")
 
-if args.dry_run:
-    print("ℹ️  Dry-run terminé — relance sans --dry-run pour appliquer")
+    return session
 
+
+def run_all_bots():
+    """Relance une session pour TOUS les bots enregistrés."""
+    db = load_bots_db()
+    bots = db.get("bots", [])
+
+    if not bots:
+        print("❌ Aucun bot dans bots_db.json")
+        return
+
+    print(f"🚀 Lancement de {len(bots)} bot(s)…\n")
+    for i, bot in enumerate(bots):
+        print(f"\n{'─' * 50}")
+        print(f"[{i + 1}/{len(bots)}] {bot['username']}")
+        print(f"{'─' * 50}")
+        run_session(bot_index=i)
+
+
+# ─── Entry point ─────────────────────────────────────────────────────────────
+
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Relance une session WikiMasters")
+    parser.add_argument("--email", type=str, help="Email du bot à relancer")
+    parser.add_argument(
+        "--index", type=int, help="Index du bot dans bots_db.json (0-based)"
+    )
+    parser.add_argument("--all", action="store_true", help="Relancer tous les bots")
+    args = parser.parse_args()
+
+    if args.all:
+        run_all_bots()
+    elif args.email:
+        run_session(email=args.email)
+    elif args.index is not None:
+        run_session(bot_index=args.index)
+    else:
+        # Par défaut : dernier bot enregistré
+        run_session()

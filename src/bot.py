@@ -1,26 +1,28 @@
-from playwright.sync_api import sync_playwright, Page, TimeoutError as PlaywrightTimeout
 import json
 import os
-import random
-import re
 from datetime import datetime
+
+from playwright.sync_api import Page, sync_playwright
 from random_username.generate import generate_username
+
+from bot_helper import (
+    HEADLESS,
+    REPORTS_DIR,
+    SITE_URL,
+    load_bots_db,
+    open_all_paquets,
+    safe_goto,
+    save_bots_db,
+    screenshot,
+)
 from email_service_copy import GuerrillaMailClient
-from bot_helper import open_all_paquets,safe_goto,load_bots_db,screenshot,save_bots_db,BOTS_DB_PATH,SCREENSHOTS_DIR,REPORTS_DIR,HEADLESS,LOGIN_URL,SITE_URL,get_counter_value,open_paquet
-
-
-
-
-
-
-
 
 
 def register_new_bot(page: Page) -> dict:
     """Register a new account and return bot credentials dict."""
     username = generate_username(1)[0]
-    gm       = GuerrillaMailClient(prefix=username)
-    email    = gm.create_email()
+    gm = GuerrillaMailClient(prefix=username)
+    email = gm.create_email()
     password = "TestPassword123!"
 
     print(f"📧 Email: {email}  |  👤 Username: {username}")
@@ -43,31 +45,31 @@ def register_new_bot(page: Page) -> dict:
     page.get_by_role("button", name="Vérifier et continuer").click()
 
     return {
-        "id":         datetime.now().strftime("%Y%m%d%H%M%S"),
-        "username":   username,
-        "email":      email,
-        "password":   password,
+        "id": datetime.now().strftime("%Y%m%d%H%M%S"),
+        "username": username,
+        "email": email,
+        "password": password,
         "created_at": datetime.now().isoformat(),
-        "sessions":   []
+        "sessions": [],
     }
 
 
+# Main bot runner
 
-# Main bot runner 
 
 def run_bot():
-    db      = load_bots_db()
+    db = load_bots_db()
     session = {
-        "date":           datetime.now().isoformat(),
-        "actions":        [],
-        "errors":         [],
+        "date": datetime.now().isoformat(),
+        "actions": [],
+        "errors": [],
         "paquets_opened": 0,
-        "screenshots":    []
+        "screenshots": [],
     }
 
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=HEADLESS)
-        page    = browser.new_page()
+        page = browser.new_page()
 
         try:
             # 1. Register
@@ -87,7 +89,9 @@ def run_bot():
 
             # 4. Screenshot collection
             page.get_by_role("link", name="Collection").click()
-            page.get_by_role("heading", name="Collection").wait_for(state="visible", timeout=10000)
+            page.get_by_role("heading", name="Collection").wait_for(
+                state="visible", timeout=10000
+            )
             path = screenshot(page, f"collection_{bot_data['username']}")
             session["screenshots"].append(path)
             session["actions"].append("✅ Screenshot collection")
@@ -114,10 +118,12 @@ def run_bot():
     os.makedirs(REPORTS_DIR, exist_ok=True)
     report_path = os.path.join(
         REPORTS_DIR,
-        f"report_{bot_data.get('username', 'unknown')}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        f"report_{bot_data.get('username', 'unknown')}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
     )
     with open(report_path, "w", encoding="utf-8") as f:
-        json.dump({"bot": bot_data, "last_session": session}, f, ensure_ascii=False, indent=2)
+        json.dump(
+            {"bot": bot_data, "last_session": session}, f, ensure_ascii=False, indent=2
+        )
 
     # 7. Console summary
     print("\n📋 RAPPORT :")

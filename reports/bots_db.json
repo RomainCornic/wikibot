@@ -75,6 +75,18 @@
           "screenshots": [
             "screenshots/erreur_20260506_002002.png"
           ]
+        },
+        {
+          "date": "2026-05-06T22:21:12.141074",
+          "type": "reconnection",
+          "actions": [],
+          "errors": [
+            "❌ Erreur fatale : Locator.wait_for: Timeout 15000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"link\", name=\"Paquets\") to be visible\n"
+          ],
+          "paquets_opened": 0,
+          "screenshots": [
+            "screenshots/erreur_20260506_222129.png"
+          ]
         }
       ]
     },
@@ -128,6 +140,18 @@
           "screenshots": [
             "screenshots/login_euphoricSeagull8_20260506_002006.png",
             "screenshots/collection_euphoricSeagull8_20260506_002021.png"
+          ]
+        },
+        {
+          "date": "2026-05-06T22:21:29.253266",
+          "type": "reconnection",
+          "actions": [],
+          "errors": [
+            "❌ Erreur fatale : Locator.wait_for: Timeout 15000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"link\", name=\"Paquets\") to be visible\n"
+          ],
+          "paquets_opened": 0,
+          "screenshots": [
+            "screenshots/erreur_20260506_222146.png"
           ]
         }
       ]
@@ -183,6 +207,18 @@
             "screenshots/login_somberDoughnut8_20260506_002025.png",
             "screenshots/collection_somberDoughnut8_20260506_002040.png"
           ]
+        },
+        {
+          "date": "2026-05-06T22:21:46.102674",
+          "type": "reconnection",
+          "actions": [],
+          "errors": [
+            "❌ Erreur fatale : Locator.wait_for: Timeout 15000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"link\", name=\"Paquets\") to be visible\n"
+          ],
+          "paquets_opened": 0,
+          "screenshots": [
+            "screenshots/erreur_20260506_222202.png"
+          ]
         }
       ]
     },
@@ -221,6 +257,18 @@
           "screenshots": [
             "screenshots/login_holisticAntelope3_20260505_234810.png",
             "screenshots/collection_holisticAntelope3_20260505_234848.png"
+          ]
+        },
+        {
+          "date": "2026-05-06T22:22:02.819851",
+          "type": "reconnection",
+          "actions": [],
+          "errors": [
+            "❌ Erreur fatale : Locator.wait_for: Timeout 15000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"link\", name=\"Paquets\") to be visible\n"
+          ],
+          "paquets_opened": 0,
+          "screenshots": [
+            "screenshots/erreur_20260506_222219.png"
           ]
         }
       ]
@@ -261,6 +309,18 @@
             "screenshots/login_somberSmelt3_20260505_234852.png",
             "screenshots/collection_somberSmelt3_20260505_234927.png"
           ]
+        },
+        {
+          "date": "2026-05-06T22:22:19.570371",
+          "type": "reconnection",
+          "actions": [],
+          "errors": [
+            "❌ Erreur fatale : Locator.wait_for: Timeout 15000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"link\", name=\"Paquets\") to be visible\n"
+          ],
+          "paquets_opened": 0,
+          "screenshots": [
+            "screenshots/erreur_20260506_222236.png"
+          ]
         }
       ]
     },
@@ -299,6 +359,18 @@
           "screenshots": [
             "screenshots/login_giddyUnicorn3_20260505_234931.png",
             "screenshots/collection_giddyUnicorn3_20260505_235010.png"
+          ]
+        },
+        {
+          "date": "2026-05-06T22:22:36.299411",
+          "type": "reconnection",
+          "actions": [],
+          "errors": [
+            "❌ Erreur fatale : Locator.wait_for: Timeout 15000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"link\", name=\"Paquets\") to be visible\n"
+          ],
+          "paquets_opened": 0,
+          "screenshots": [
+            "screenshots/erreur_20260506_222253.png"
           ]
         }
       ]
@@ -339,6 +411,18 @@
             "screenshots/login_pluckySeahorse6_20260505_235014.png",
             "screenshots/collection_pluckySeahorse6_20260505_235050.png"
           ]
+        },
+        {
+          "date": "2026-05-06T22:22:53.167248",
+          "type": "reconnection",
+          "actions": [],
+          "errors": [
+            "❌ Erreur fatale : Locator.wait_for: Timeout 15000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"link\", name=\"Paquets\") to be visible\n"
+          ],
+          "paquets_opened": 0,
+          "screenshots": [
+            "screenshots/erreur_20260506_222309.png"
+          ]
         }
       ]
     },
@@ -377,6 +461,18 @@
           "screenshots": [
             "screenshots/login_ferventSausage3_20260505_235053.png",
             "screenshots/collection_ferventSausage3_20260505_235127.png"
+          ]
+        },
+        {
+          "date": "2026-05-06T22:23:10.000681",
+          "type": "reconnection",
+          "actions": [],
+          "errors": [
+            "❌ Erreur fatale : Locator.wait_for: Timeout 15000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"link\", name=\"Paquets\") to be visible\n"
+          ],
+          "paquets_opened": 0,
+          "screenshots": [
+            "screenshots/erreur_20260506_222326.png"
           ]
         }
       ]
@@ -429,6 +525,18 @@
             "screenshots/login_alertCockatoo1_20260506_001200.png",
             "screenshots/collection_alertCockatoo1_20260506_001244.png"
           ]
+        },
+        {
+          "date": "2026-05-06T22:23:26.721902",
+          "type": "reconnection",
+          "actions": [],
+          "errors": [
+            "❌ Erreur fatale : Locator.wait_for: Timeout 15000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"link\", name=\"Paquets\") to be visible\n"
+          ],
+          "paquets_opened": 0,
+          "screenshots": [
+            "screenshots/erreur_20260506_222343.png"
+          ]
         }
       ]
     },
@@ -465,6 +573,18 @@
           "screenshots": [
             "screenshots/login_cautiousFalcon5_20260505_235147.png",
             "screenshots/collection_cautiousFalcon5_20260505_235214.png"
+          ]
+        },
+        {
+          "date": "2026-05-06T22:23:43.572196",
+          "type": "reconnection",
+          "actions": [],
+          "errors": [
+            "❌ Erreur fatale : Locator.wait_for: Timeout 15000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"link\", name=\"Paquets\") to be visible\n"
+          ],
+          "paquets_opened": 0,
+          "screenshots": [
+            "screenshots/erreur_20260506_222400.png"
           ]
         }
       ]
@@ -505,6 +625,18 @@
             "screenshots/login_mereDove5_20260505_235218.png",
             "screenshots/collection_mereDove5_20260505_235254.png"
           ]
+        },
+        {
+          "date": "2026-05-06T22:24:00.403679",
+          "type": "reconnection",
+          "actions": [],
+          "errors": [
+            "❌ Erreur fatale : Locator.wait_for: Timeout 15000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"link\", name=\"Paquets\") to be visible\n"
+          ],
+          "paquets_opened": 0,
+          "screenshots": [
+            "screenshots/erreur_20260506_222416.png"
+          ]
         }
       ]
     },
@@ -543,6 +675,18 @@
           "screenshots": [
             "screenshots/login_grizzledGranola0_20260505_235259.png",
             "screenshots/collection_grizzledGranola0_20260505_235334.png"
+          ]
+        },
+        {
+          "date": "2026-05-06T22:24:17.058537",
+          "type": "reconnection",
+          "actions": [],
+          "errors": [
+            "❌ Erreur fatale : Locator.wait_for: Timeout 15000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"link\", name=\"Paquets\") to be visible\n"
+          ],
+          "paquets_opened": 0,
+          "screenshots": [
+            "screenshots/erreur_20260506_222433.png"
           ]
         }
       ]
@@ -583,6 +727,18 @@
             "screenshots/login_cynicalWidgeon0_20260505_235338.png",
             "screenshots/collection_cynicalWidgeon0_20260505_235418.png"
           ]
+        },
+        {
+          "date": "2026-05-06T22:24:33.754621",
+          "type": "reconnection",
+          "actions": [],
+          "errors": [
+            "❌ Erreur fatale : Locator.wait_for: Timeout 15000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"link\", name=\"Paquets\") to be visible\n"
+          ],
+          "paquets_opened": 0,
+          "screenshots": [
+            "screenshots/erreur_20260506_222450.png"
+          ]
         }
       ]
     },
@@ -606,6 +762,18 @@
           "screenshots": [
             "screenshots/login_pleasedPup7_20260506_001312.png",
             "screenshots/collection_pleasedPup7_20260506_001359.png"
+          ]
+        },
+        {
+          "date": "2026-05-06T22:24:50.471303",
+          "type": "reconnection",
+          "actions": [],
+          "errors": [
+            "❌ Erreur fatale : Locator.wait_for: Timeout 15000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"link\", name=\"Paquets\") to be visible\n"
+          ],
+          "paquets_opened": 0,
+          "screenshots": [
+            "screenshots/erreur_20260506_222507.png"
           ]
         }
       ]

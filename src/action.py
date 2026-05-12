@@ -3,7 +3,9 @@ def discover_actions(page):
     actions = []
 
     # Trouver tous les boutons
-    buttons = page.query_selector_all("button, input[type='button'], input[type='submit']")
+    buttons = page.query_selector_all(
+        "button, input[type='button'], input[type='submit']"
+    )
     for btn in buttons:
         text = btn.inner_text() or btn.get_attribute("value") or "?"
         actions.append({"type": "button", "label": text, "element": btn})
@@ -18,6 +20,8 @@ def discover_actions(page):
     # Trouver les formulaires
     forms = page.query_selector_all("form")
     for i, form in enumerate(forms):
-        actions.append({"type": "form", "label": f"Formulaire #{i+1}", "element": form})
+        actions.append(
+            {"type": "form", "label": f"Formulaire #{i + 1}", "element": form}
+        )
 
     return actions

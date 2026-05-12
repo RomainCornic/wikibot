@@ -1,8 +1,9 @@
-import requests
 import random
+import re
 import string
 import time
-import re
+
+import requests
 
 
 class GuerrillaMailClient:
@@ -15,18 +16,12 @@ class GuerrillaMailClient:
         self.sid_token = None
 
     def create_email(self):
-        suffix = ''.join(
-            random.choices(string.ascii_lowercase + string.digits, k=8)
-        )
+        suffix = "".join(random.choices(string.ascii_lowercase + string.digits, k=8))
 
         username = f"{self.prefix}_{suffix}"
 
         response = self.session.get(
-            self.API_URL,
-            params={
-                "f": "set_email_user",
-                "email_user": username
-            }
+            self.API_URL, params={"f": "set_email_user", "email_user": username}
         )
 
         data = response.json()
@@ -41,11 +36,7 @@ class GuerrillaMailClient:
 
         while time.time() - start < timeout:
             response = self.session.get(
-                self.API_URL,
-                params={
-                    "f": "check_email",
-                    "seq": 0
-                }
+                self.API_URL, params={"f": "check_email", "seq": 0}
             )
 
             data = response.json()
@@ -59,11 +50,7 @@ class GuerrillaMailClient:
 
     def fetch_email(self, mail_id):
         response = self.session.get(
-            self.API_URL,
-            params={
-                "f": "fetch_email",
-                "email_id": mail_id
-            }
+            self.API_URL, params={"f": "fetch_email", "email_id": mail_id}
         )
 
         return response.json()
@@ -88,14 +75,11 @@ class GuerrillaMailClient:
             self.session.get(link)
 
         return link
-    
+
     def get_latest_code(self, mail, pattern=r"\b\d{6}\b"):
         content = self.fetch_email(mail["mail_id"])
 
-        body = (
-            content.get("mail_body", "")
-            or content.get("mail_excerpt", "")
-        )
+        body = content.get("mail_body", "") or content.get("mail_excerpt", "")
 
         match = re.search(r"\b(\d{6})\b", body)
 
@@ -103,10 +87,10 @@ class GuerrillaMailClient:
             return match.group(1)
 
         return None
+
     def snapshot_mail_ids(self):
         mails = self.get_email_list()
         return {mail["mail_id"] for mail in mails}
-
 
     def wait_for_matching_email(
         self,
@@ -142,15 +126,10 @@ class GuerrillaMailClient:
             time.sleep(poll_interval)
 
         return None
-        
 
     def get_email_list(self):
         response = self.session.get(
-            self.API_URL,
-            params={
-                "f": "get_email_list",
-                "offset": 0
-            }
+            self.API_URL, params={"f": "get_email_list", "offset": 0}
         )
 
         data = response.json()
